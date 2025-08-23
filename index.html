@@ -9,41 +9,35 @@
       margin: 40px;
       background-color: #f8f9fa;
       color: #333;
-    }
-    h1 {
-      color: #0056b3;
-      margin-bottom: 10px;
+      text-align: center;
     }
     .banner {
       width: 100%;
       height: 120px;
-      background-color: #ddd;
-      background-image: url("photo2.jpg"); /* Placeholder banderole */
+      background-image: url("photo1.jpg"); /* banderole */
       background-size: cover;
       background-position: center;
       border-radius: 8px;
       margin-bottom: 30px;
     }
-    .reports {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+    .circle {
+      width: 150px;
+      height: 150px;
+      background-image: url("photo.jpg"); /* portrait cercle */
+      background-size: cover;
+      background-position: center;
+      border-radius: 50%;
+      margin: 0 auto 30px auto;
     }
     .report-card {
+      display: inline-block;
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 8px;
       width: 250px;
       padding: 15px;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .report-card img {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 10px;
+      margin-top: 20px;
     }
     .report-card a {
       display: block;
@@ -59,27 +53,13 @@
 </head>
 <body>
   <div class="banner"></div>
+  <div class="circle"></div>
 
   <h1>Table des matières – Rapports disponibles</h1>
-  <div class="reports">
-    <div class="report-card">
-      <img src="photo1.jpg" alt="Rapport de production">
-      <p>Rapport de production</p>
-      <a href="rapport-production.html">Ouvrir</a>
-    </div>
 
-    <!-- Exemple d’autres rapports -->
-    <div class="report-card">
-      <img src="photo3.jpg" alt="Rapport Janvier">
-      <p>Rapport Janvier</p>
-      <a href="rapport-janvier.html">Ouvrir</a>
-    </div>
-
-    <div class="report-card">
-      <img src="photo4.jpg" alt="Rapport Février">
-      <p>Rapport Février</p>
-      <a href="rapport-fevrier.html">Ouvrir</a>
-    </div>
+  <div class="report-card">
+    <p>Rapport de production</p>
+    <a href="rapport_production.html">Ouvrir</a>
   </div>
 </body>
 </html>
