@@ -1,0 +1,178 @@
+import pandas as pd
+
+# Colonnes utiles (internes)
+COLONNES_UTILES = [
+    "CAC", "SDB/SE", "ST", "Équipements", "Appartement", "Adresse",
+    "Rénovations", "Garage", "Vue", "Particularités",
+    "Évaluation", "Année", "Prix", "JSM", "Eval%", "Prix/pc", "No Centris", "FCM"
+]
+
+# Mapping pour les fichiers en français
+MAPPING_FR = {
+    "Équipements/Services": "Équipements",
+    "Garage (nombre)": "Garage",
+    "Évaluation totale": "Évaluation",
+    "Année de construction": "Année",
+    "Particularités du site": "Particularités"
+}
+
+# Mapping pour les fichiers en anglais
+MAPPING_EN = {
+    "Bdrm": "CAC",
+    "Bath/PR": "SDB/SE",
+    "Equipments/Services": "Équipements",
+    "Apartment": "Appartement",
+    "Address": "Adresse",
+    "Renovations": "Rénovations",
+    "Garage (number)": "Garage",
+    "View": "Vue",
+    "Distinctive Features": "Particularités",
+    "Total Assessment": "Évaluation",
+    "Year Built": "Année",
+    "Price": "Prix",
+    "DOM": "JSM",
+    "Asses%": "Eval%",
+    "Price/Sqft": "Prix/pc",
+    "Centris No.": "No Centris",
+    "MCF": "FCM"
+}
+
+
+def generer_rapport_consolide_avec_renov(fichier_excel, sortie_html="rapport.html"):
+    df = pd.read_excel(fichier_excel)
+
+    # Détection langue
+    colonnes = df.columns.tolist()
+    if any(c in colonnes for c in MAPPING_EN.keys()):
+        langue = "EN"
+        df = df.rename(columns=MAPPING_EN)
+    else:
+        langue = "FR"
+        df = df.rename(columns=MAPPING_FR)
+
+    df = df[COLONNES_UTILES]
+
+    def nettoyer_montant(val):
+        if isinstance(val, str):
+            return float(val.replace("$", "").replace(" ", "").replace(",", ""))
+        return val
+
+    for col in ["Évaluation", "Prix", "Prix/pc", "FCM"]:
+        if col in df.columns:
+            df[col] = df[col].apply(nettoyer_montant)
+
+    comparables = df[df["ST"] == "VE"].copy()
+    cible = df[df["ST"] == "?"].iloc[0]
+
+    prixVals = comparables["Prix"].dropna().tolist()
+    prixMoyen = sum(prixVals) / len(prixVals)
+    prixTrie = sorted(prixVals)
+    prixMedian = prixTrie[len(prixTrie) // 2]
+    evalPctMoy = comparables["Eval%"].dropna().mean()
+
+    estimation = round(cible["Évaluation"] * (evalPctMoy / 100))
+    fourchette = [round(estimation * 0.96), round(estimation * 1.02)]
+
+    # En-têtes bilingues
+    if langue == "FR":
+        headers = {"resume": "Résumé des comparables", "stats": "Statistiques",
+                   "reco": "Recommandation de prix", "raison": "Raisonnement",
+                   "reno": "Réno", "vue": "Vue", "part": "Particularités", "renov": "Rénovations"}
+    else:
+        headers = {"resume": "Comparables Summary", "stats": "Statistics",
+                   "reco": "Price Recommendation", "raison": "Rationale",
+                   "reno": "Reno", "vue": "View", "part": "Features", "renov": "Renovations"}
+
+    # Raisonnement fixe
+    if langue == "FR":
+        raisonnement = f"En se basant sur un ratio moyen de {evalPctMoy:.1f} % appliqué à l’évaluation municipale ({int(cible['Évaluation']):,} $), " \
+                       f"le prix suggéré pour cette unité est d’environ {estimation:,} $, avec une fourchette réaliste entre {fourchette[0]:,} $ et {fourchette[1]:,} $."
+    else:
+        raisonnement = f"Based on an average ratio of {evalPctMoy:.1f}% applied to the municipal assessment ({int(cible['Évaluation']):,} $), " \
+                       f"the suggested price for this unit is about {estimation:,} $, with a realistic range between {fourchette[0]:,} $ and {fourchette[1]:,} $."
+
+    # HTML
+    html = f"""<html><head><meta charset="UTF-8">
+    <style>
+    body {{ font-family: Arial, sans-serif; margin: 40px; }}
+    h1, h2, h3 {{ color: #333; }}
+    table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}
+    th, td {{ border: 1px solid #ccc; padding: 8px; }}
+    th {{ background: #BEAF87; color: white; }}
+    td.num {{ text-align: right; }}
+    td.txt {{ text-align: center; }}
+    .page-break {{ page-break-before: always; }}
+    .photo, .map {{ width: 48%; display: inline-block; vertical-align: top; }}
+    img {{ max-width: 100%; height: auto; border: 1px solid #ddd; }}
+    </style></head><body>"""
+
+    h = headers
+
+    # Résumé global
+    html += f"<h1>{h['resume']}</h1><table><tr><th>Unité</th><th>CAC</th><th>SDB/SE</th><th>Garage</th><th>{h['reno']}</th><th>{h['vue']}</th><th>{h['part']}</th><th>Évaluation</th><th>Prix</th><th>Eval%</th><th>Prix/pc</th><th>JSM</th><th>Année</th></tr>"
+
+    for _, c in comparables.iterrows():
+        reno = "O" if pd.notna(c["Rénovations"]) else "N" if langue == "FR" else ("Y" if pd.notna(c["Rénovations"]) else "N")
+        vue = "O" if pd.notna(c["Vue"]) else "N" if langue == "FR" else ("Y" if pd.notna(c["Vue"]) else "N")
+        part = "O" if pd.notna(c["Particularités"]) else "N" if langue == "FR" else ("Y" if pd.notna(c["Particularités"]) else "N")
+        eval_val = f"{int(c['Évaluation']):,} $" if pd.notnull(c["Évaluation"]) else "-"
+        prix_val = f"{int(c['Prix']):,} $" if pd.notnull(c["Prix"]) else "-"
+        prix_pc_val = f"{int(c['Prix/pc']):,} $" if pd.notnull(c["Prix/pc"]) else "-"
+        jsm_val = f"{int(c['JSM'])}" if pd.notnull(c["JSM"]) else "-"
+        annee_val = f"{int(c['Année'])}" if pd.notnull(c["Année"]) else "-"
+        evalpct_val = f"{c['Eval%']:.1f}" if pd.notnull(c["Eval%"]) else "-"
+        html += f"<tr><td class='txt'>{c['Appartement']}</td><td class='txt'>{c['CAC']}</td><td class='txt'>{c['SDB/SE']}</td><td class='txt'>{c['Garage']}</td><td class='txt'>{reno}</td><td class='txt'>{vue}</td><td class='txt'>{part}</td><td class='num'>{eval_val}</td><td class='num'>{prix_val}</td><td class='num'>{evalpct_val}</td><td class='num'>{prix_pc_val}</td><td class='num'>{jsm_val}</td><td class='num'>{annee_val}</td></tr>"
+
+    html += "</table>"
+
+    html += f"<h2>{h['stats']}</h2><ul><li>Prix moyen : {int(prixMoyen):,} $</li><li>Prix médian : {int(prixMedian):,} $</li><li>Ratio moyen éval% : {evalPctMoy:.1f} %</li></ul>"
+    html += f"<h2>{h['reco']}</h2><p><strong>Prix suggéré : {estimation:,} $</strong></p><p>Fourchette : {fourchette[0]:,} $ – {fourchette[1]:,} $</p><h3>{h['raison']}</h3><p>{raisonnement}</p>"
+
+    # Pages individuelles
+    for _, u in df.iterrows():
+        html += '<div class="page-break"></div>'
+        html += f"<h1>{u['Adresse']}, app. {u['Appartement']}</h1>"
+        centris_photo = f"{int(u['No Centris'])}.jpg" if pd.notnull(u['No Centris']) else "default.jpg"
+        html += f"""<div class="photo"><img src="{centris_photo}" onerror="this.onerror=null; this.src='default.jpg';" alt="Photo"></div>
+                    <div class="map"><iframe src="https://www.google.com/maps?q={u['Adresse'].replace(' ', '+')}&output=embed" width="100%" height="300"></iframe></div>"""
+        html += "<h2>Identification</h2><table>"
+        centris_val = f"{int(u['No Centris'])}" if pd.notnull(u['No Centris']) else "-"
+        annee_val = f"{int(u['Année'])}" if pd.notnull(u['Année']) else "-"
+        html += f"<tr><th>Appartement</th><td class='txt'>{u['Appartement']}</td></tr>"
+        html += f"<tr><th>Adresse</th><td class='txt'>{u['Adresse']}</td></tr>"
+        html += f"<tr><th>No Centris</th><td class='num'>{centris_val}</td></tr>"
+        html += f"<tr><th>Année</th><td class='num'>{annee_val}</td></tr></table>"
+
+        vue_val = u['Vue'] if pd.notna(u['Vue']) else "-"
+        part_val = u['Particularités'] if pd.notna(u['Particularités']) else "-"
+        renov_val = u['Rénovations'] if pd.notna(u['Rénovations']) else "-"
+        html += f"<h2>Caractéristiques</h2><table>"
+        html += f"<tr><th>CAC</th><td class='txt'>{u['CAC']}</td></tr>"
+        html += f"<tr><th>SDB/SE</th><td class='txt'>{u['SDB/SE']}</td></tr>"
+        html += f"<tr><th>Garage</th><td class='txt'>{u['Garage']}</td></tr>"
+        html += f"<tr><th>{h['renov']}</th><td class='txt'>{renov_val}</td></tr>"
+        html += f"<tr><th>{h['vue']}</th><td class='txt'>{vue_val}</td></tr>"
+        html += f"<tr><th>{h['part']}</th><td class='txt'>{part_val}</td></tr></table>"
+
+        eval_val = f"{int(u['Évaluation']):,} $" if pd.notnull(u['Évaluation']) else "-"
+        prix_val = f"{int(u['Prix']):,} $" if pd.notnull(u['Prix']) else "-"
+        prix_pc_val = f"{int(u['Prix/pc']):,} $" if pd.notnull(u['Prix/pc']) else "-"
+        fcm_val = f"{int(u['FCM']):,} $" if pd.notnull(u['FCM']) else "-"
+        evalpct_val = f"{u['Eval%']:.1f}" if pd.notnull(u['Eval%']) else "-"
+        html += "<h2>Valeurs financières</h2><table>"
+        html += f"<tr><th>Évaluation</th><td class='num'>{eval_val}</td></tr>"
+        html += f"<tr><th>Prix</th><td class='num'>{prix_val}</td></tr>"
+        html += f"<tr><th>Prix/pc</th><td class='num'>{prix_pc_val}</td></tr>"
+        html += f"<tr><th>Eval%</th><td class='num'>{evalpct_val}</td></tr>"
+        html += f"<tr><th>Frais de condo</th><td class='num'>{fcm_val}</td></tr></table>"
+
+        jsm_val = f"{int(u['JSM'])}" if pd.notnull(u['JSM']) else "-"
+        html += "<h2>Marché</h2><table>"
+        html += f"<tr><th>JSM</th><td class='num'>{jsm_val}</td></tr></table>"
+
+    html += "</body></html>"
+
+    with open(sortie_html, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    return sortie_html
