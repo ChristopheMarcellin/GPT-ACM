@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculateur hypothécaire C21</title>
+  <style>
+    :root{
+      --c21-gold:#BEAF87;
+      --c21-black:#111111;
+      --c21-blue:#5E7FA3;
+      --c21-blue-dark:#476584;
+      --c21-cream:#F7F3EA;
+      --c21-line:#D8CCAE;
+      --c21-text:#222222;
+      --c21-muted:#6E6A61;
+      --c21-good:#2D6A4F;
+      --c21-warn:#9C6644;
+      --shadow: 0 10px 25px rgba(0,0,0,.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background:
+        linear-gradient(180deg, #fbfaf7 0%, #f6f0e3 100%);
+      color: var(--c21-text);
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--c21-black) 0%, #1a1a1a 55%, #2d2d2d 100%);
+      color: white;
+      border-radius: 22px;
+      padding: 24px 24px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+      border: 1px solid rgba(190,175,135,.25);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: .4px;
+      color: var(--c21-gold);
+      margin-bottom: 8px;
+    }
+
+    .brand-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--c21-gold);
+      color: var(--c21-black);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.1;
+    }
+
+    .sub {
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      max-width: 800px;
+      line-height: 1.45;
+    }
+
+    .hero-note {
+      margin-top: 16px;
+      display: inline-block;
+      background: rgba(190,175,135,.16);
+      border: 1px solid rgba(190,175,135,.28);
+      color: #f5edd8;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 22px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--c21-line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      background: linear-gradient(90deg, var(--c21-gold) 0%, #d1c4a0 100%);
+      color: var(--c21-black);
+      padding: 14px 16px;
+      font-weight: 700;
+      font-size: 16px;
+      border-bottom: 1px solid var(--c21-line);
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .section-title {
+      margin: 2px 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--c21-blue-dark);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px 14px;
+      margin-bottom: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--c21-black);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--c21-muted);
+      margin-top: -2px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 12px;
+      border: 1px solid #cfc5aa;
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+      background: #fffdf9;
+      color: var(--c21-text);
+      transition: .15s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--c21-blue);
+      box-shadow: 0 0 0 4px rgba(94,127,163,.16);
+      background: white;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .results {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      border: 1px solid var(--c21-line);
+      border-radius: 16px;
+      padding: 15px 15px 14px;
+      background: linear-gradient(180deg, #fffefb 0%, #f8f3e9 100%);
+    }
+
+    .metric.primary {
+      background: linear-gradient(135deg, var(--c21-blue) 0%, var(--c21-blue-dark) 100%);
+      color: white;
+      border-color: rgba(0,0,0,.08);
+    }
+
+    .metric.gold {
+      background: linear-gradient(135deg, var(--c21-gold) 0%, #cfc19b 100%);
+      color: var(--c21-black);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      opacity: .9;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .metric-sub {
+      font-size: 13px;
+      opacity: .92;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid var(--c21-line);
+    }
+
+    .detail-table th,
+    .detail-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid #e6dcc5;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .detail-table th {
+      background: var(--c21-black);
+      color: white;
+      font-weight: 700;
+    }
+
+    .detail-table tr:nth-child(odd) td {
+      background: #fbf8f2;
+    }
+
+    .detail-table tr:nth-child(even) td {
+      background: white;
+    }
+
+    .detail-table td:last-child {
+      text-align: right;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--c21-muted);
+      line-height: 1.45;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pill {
+      background: #f4efe3;
+      border: 1px solid var(--c21-line);
+      color: var(--c21-black);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .warn {
+      color: var(--c21-warn);
+      font-weight: 700;
+    }
+
+    @media (max-width: 920px) {
+      .grid,
+      .results,
+      .form-grid,
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="brand">
+            <div class="brand-badge">C21</div>
+            Calculateur hypothécaire
+          </div>
+          <h1>Paiement réel + revenu brut requis</h1>
+          <p class="sub">
+            Le paiement mensuel est calculé avec le taux affiché. Le revenu requis est estimé selon un modèle de 44 %
+            avec dettes mensuelles incluses et qualification bancaire prudente en arrière-plan.
+          </p>
+          <div class="hero-note">Mise à jour automatique — aucun bouton requis</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-head">Données à entrer</div>
+        <div class="card-body">
+
+          <div class="section-title">Financement</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="loanAmount">Montant financé ($)</label>
+              <input id="loanAmount" type="number" min="0" step="1000" value="500000" />
+            </div>
+
+            <div class="field">
+              <label for="rate">Taux affiché (%)</label>
+              <input id="rate" type="number" min="0" step="0.01" value="4.50" />
+            </div>
+
+            <div class="field">
+              <label for="amortYears">Amortissement</label>
+              <select id="amortYears">
+                <option value="20">20 ans</option>
+                <option value="25" selected>25 ans</option>
+                <option value="30">30 ans</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="ratio">Ratio max (%)</label>
+              <input id="ratio" type="number" min="1" max="100" step="0.1" value="44" />
+            </div>
+          </div>
+
+          <div class="section-title">Coûts habitation mensuels</div>
+          <div class="mini-grid">
+            <div class="field">
+              <label for="taxes">Taxes ($/mois)</label>
+              <input id="taxes" type="number" min="0" step="1" value="250" />
+            </div>
+
+            <div class="field">
+              <label for="heating">Chauffage ($/mois)</label>
+              <input id="heating" type="number" min="0" step="1" value="150" />
+            </div>
+
+            <div class="field">
+              <label for="condo">Frais de condo ($/mois)</label>
+              <input id="condo" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top:18px;">Dettes mensuelles</div>
+          <div class="mini-grid">
+            <div class="field">
+              <label for="carPayment">Auto ($/mois)</label>
+              <input id="carPayment" type="number" min="0" step="1" value="0" />
+            </div>
+
+            <div class="field">
+              <label for="creditCards">Cartes ($/mois)</label>
+              <input id="creditCards" type="number" min="0" step="1" value="0" />
+            </div>
+
+            <div class="field">
+              <label for="otherDebts">Autres dettes ($/mois)</label>
+              <input id="otherDebts" type="number" min="0" step="1" value="0" />
+            </div>
+          </div>
+
+          <div class="pill-row">
+            <div class="pill">Paiement affiché = taux réel</div>
+            <div class="pill">Revenu requis = modèle 44 % + dettes</div>
+            <div class="pill">Qualification bancaire interne</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Résultats</div>
+        <div class="card-body">
+          <div class="results">
+            <div class="metric primary">
+              <div class="metric-label">Paiement hypothécaire réel</div>
+              <div class="metric-value" id="realPaymentDisplay">$0</div>
+              <div class="metric-sub">par mois</div>
+            </div>
+
+            <div class="metric gold">
+              <div class="metric-label">Revenu brut requis</div>
+              <div class="metric-value" id="incomeYearDisplay">$0</div>
+              <div class="metric-sub">par année</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Revenu brut requis</div>
+              <div class="metric-value" id="incomeMonthDisplay">$0</div>
+              <div class="metric-sub">par mois</div>
+            </div>
+
+            <div class="metric">
+              <div class="metric-label">Charge mensuelle totale</div>
+              <div class="metric-value" id="totalMonthlyDisplay">$0</div>
+              <div class="metric-sub">habitation + dettes</div>
+            </div>
+          </div>
+
+          <table class="detail-table">
+            <thead>
+              <tr>
+                <th>Élément</th>
+                <th>Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Paiement hypothécaire réel</td><td id="rowRealPayment">$0</td></tr>
+              <tr><td>Paiement qualifié utilisé par le calcul</td><td id="rowQualifiedPayment">$0</td></tr>
+              <tr><td>Taxes</td><td id="rowTaxes">$0</td></tr>
+              <tr><td>Chauffage</td><td id="rowHeating">$0</td></tr>
+              <tr><td>Frais de condo</td><td id="rowCondo">$0</td></tr>
+              <tr><td>Total habitation</td><td id="rowHousingTotal">$0</td></tr>
+              <tr><td>Dettes mensuelles</td><td id="rowDebts">$0</td></tr>
+              <tr><td>Total mensuel global</td><td id="rowGrandTotal">$0</td></tr>
+            </tbody>
+          </table>
+
+          <div class="footer-note">
+            Estimation simplifiée à titre indicatif seulement. Les critères finaux peuvent varier selon l’institution,
+            le dossier de crédit, la mise de fonds, le type d’immeuble et les frais applicables.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ids = [
+      "loanAmount","rate","amortYears","ratio",
+      "taxes","heating","condo",
+      "carPayment","creditCards","otherDebts"
+    ];
+
+    ids.forEach(id => {
+      document.getElementById(id).addEventListener("input", calculate);
+      document.getElementById(id).addEventListener("change", calculate);
+    });
+
+    function val(id) {
+      const n = parseFloat(document.getElementById(id).value);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function monthlyPayment(principal, annualRate, years) {
+      const n = years * 12;
+      if (principal <= 0 || n <= 0) return 0;
+
+      const r = annualRate / 100 / 12;
+      if (r === 0) return principal / n;
+
+      return principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    }
+
+    function fmtMoney(value, decimals = 0) {
+      return value.toLocaleString("fr-CA", {
+        style: "currency",
+        currency: "CAD",
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function calculate() {
+      const loanAmount = val("loanAmount");
+      const rate = val("rate");
+      const amortYears = val("amortYears");
+      const ratioPct = val("ratio");
+
+      const taxes = val("taxes");
+      const heating = val("heating");
+      const condo = val("condo");
+
+      const carPayment = val("carPayment");
+      const creditCards = val("creditCards");
+      const otherDebts = val("otherDebts");
+
+      const debtTotal = carPayment + creditCards + otherDebts;
+      const ratio = ratioPct > 0 ? ratioPct / 100 : 0.44;
+
+      const realPayment = monthlyPayment(loanAmount, rate, amortYears);
+
+      // Qualification interne discrète : +2 %
+      const qualifiedRate = rate + 2;
+      const qualifiedPayment = monthlyPayment(loanAmount, qualifiedRate, amortYears);
+
+      const housingTotal = qualifiedPayment + taxes + heating + condo;
+      const totalMonthly = housingTotal + debtTotal;
+      const requiredMonthlyIncome = ratio > 0 ? totalMonthly / ratio : 0;
+      const requiredYearIncome = requiredMonthlyIncome * 12;
+
+      document.getElementById("realPaymentDisplay").textContent = fmtMoney(realPayment);
+      document.getElementById("incomeYearDisplay").textContent = fmtMoney(requiredYearIncome);
+      document.getElementById("incomeMonthDisplay").textContent = fmtMoney(requiredMonthlyIncome);
+      document.getElementById("totalMonthlyDisplay").textContent = fmtMoney(totalMonthly);
+
+      document.getElementById("rowRealPayment").textContent = fmtMoney(realPayment);
+      document.getElementById("rowQualifiedPayment").textContent = fmtMoney(qualifiedPayment);
+      document.getElementById("rowTaxes").textContent = fmtMoney(taxes);
+      document.getElementById("rowHeating").textContent = fmtMoney(heating);
+      document.getElementById("rowCondo").textContent = fmtMoney(condo);
+      document.getElementById("rowHousingTotal").textContent = fmtMoney(housingTotal);
+      document.getElementById("rowDebts").textContent = fmtMoney(debtTotal);
+      document.getElementById("rowGrandTotal").textContent = fmtMoney(totalMonthly);
+    }
+
+    calculate();
+  </script>
+</body>
+</html>
