@@ -1,16 +1,66 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>ACM</title>
+  <title>Rapports</title>
   <style>
-    body { margin:0; }
-    iframe { width:100%; height:100vh; border:none; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background-color: #f8f9fa;
+      color: #333;
+      text-align: center;
+    }
+    .banner {
+      width: 100%;
+      height: 120px;
+      background-image: url("photo1.jpg"); /* banderole */
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .circle {
+      width: 150px;
+      height: 150px;
+      background-image: url("photo.jpg"); /* portrait cercle */
+      background-size: cover;
+      background-position: center;
+      border-radius: 50%;
+      margin: 0 auto 30px auto;
+    }
+    .report-card {
+      display: inline-block;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 250px;
+      padding: 15px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .report-card a {
+      display: block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .report-card a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
+  <div class="banner"></div>
+  <div class="circle"></div>
 
-<iframe src="https://script.google.com/macros/s/AKfycbyDqfEpJOPXb2bzqBdz0F3cLj5CdjI_SSJQuGw5Omue9cEXD34MVHch0BGQBAqYyo_hUQ/exec?view=nutrition"></iframe>
+  <h1>Table des matières – Rapports disponibles</h1>
 
+  <div class="report-card">
+    <p>Rapport de production</p>
+    <a href="rapport_production.html">Ouvrir</a>
+  </div>
 </body>
 </html>
