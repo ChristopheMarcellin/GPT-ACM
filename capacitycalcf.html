@@ -318,10 +318,13 @@
             <div class="brand-badge">C21</div>
             Calculateur hypothécaire
           </div>
-          <h1>Paiement réel + revenu brut requis</h1>
+          <h1>Calcul du paiement hypothécaire et du revenu brut requis</h1>
           <p class="sub">
-            Le paiement mensuel est calculé avec le taux affiché. Le revenu requis est estimé selon un modèle de 44 %
-            avec dettes mensuelles incluses et qualification bancaire prudente en arrière-plan.
+            Entrer vos données à gauche et obtenez à droite sous la section résultats.
+            - Votre paiement hypothécaire réel à prévoir
+            - Les revenus bruts annuels requis
+            - Les revenus bruts mensuels requis
+            - Charge mensuelle totale basée dépenses et paiement hypothécaire avec stress
           </p>
           <div class="hero-note">Mise à jour automatique — aucun bouton requis</div>
         </div>
@@ -336,7 +339,7 @@
           <div class="section-title">Financement</div>
           <div class="form-grid">
             <div class="field">
-              <label for="loanAmount">Montant financé ($)</label>
+              <label for="loanAmount">Montant financé ($) *</label>
               <input id="loanAmount" type="number" min="0" step="1000" value="500000" />
             </div>
 
@@ -355,7 +358,7 @@
             </div>
 
             <div class="field">
-              <label for="ratio">* Ratio endettement max (%)  </label>
+              <label for="ratio">Ratio endettement max (%) **  </label>
              <input id="ratio" type="number" min="39" max="44" step="1" value="44"
        style="background-color:#f0f0f0; color:#666; font-weight:600;">
             </div>
@@ -397,8 +400,13 @@
             </div>
           </div>
           <div class="footer-note">
-           *Ce taux est déterminé par votre institution bancaire et n'a pas à être modifié puisque le taux appliqué est plutôt standard et conservateur.
-            Il s'agit d'une seuil d'endettement que le prêteur ne veut pas franchir.
+            <p>
+              * Il faut inclure le montant de la prime de l'assureur hypothécaire si applicable (généralement 2.8% à 4% du montant 
+              emprunté selon la mise de fonds).
+              ** Ce taux est déterminé par votre institution bancaire et n'a pas à être modifié puisque le taux appliqué 
+              est plutôt standard et conservateur. Il s'agit d'une seuil d'endettement que le prêteur ne veut pas franchir.
+             </p>
+            
           </div>
 
         </div>
